@@ -17,4 +17,4 @@ This application is not published anywhere yet. Only way to use it for now is to
 Licensed under the MIT license!
 
 ## Demo
-Watch the [demo]() to see how it works! 
+Watch the [demo](https://youtu.be/2J-WZq-vKIs) to see how it works! 
