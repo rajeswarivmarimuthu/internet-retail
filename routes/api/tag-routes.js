@@ -36,9 +36,12 @@ router.post('/', async(req, res) => {
   // Route to create a new tag
   try{
     if (req.body) {
-      console.log(req.body);
       const newTag = await Tag.create(req.body);
-      res.status(200).json(newTag.id);
+      const createMessage = {
+        message: 'Successfully Created the Tag',
+        data: newTag.id
+      }
+      res.status(200).json(createMessage);
       return;
     }
     else 
@@ -61,9 +64,17 @@ router.put('/:id', async (req, res) => {
           id: req.params.id,
         },
       })
-      console.log(updatedTag)
-      res.status(200).json(updatedTag);
-      return;
+      if (updatedTag) {
+        const tagData = await Tag.findByPk(req.params.id, {
+          include: [{model: Product, through: ProductTag, as: 'tag_products'}],
+        });
+        const putMessage = {
+          message: 'Successfully updated the Tag',
+          data: tagData
+        }
+        res.status(200).json(putMessage);
+        return;
+      }
     }
     else 
     {
@@ -80,10 +91,19 @@ router.delete('/:id', async (req, res) => {
   // delete on tag by its `id` value
   try{
     if (req.params.id) {
+
+      const tagData = await Tag.findByPk(req.params.id, {
+        include: [{model: Product, through: ProductTag, as: 'tag_products'}],
+      });
+
       const deletedData = await Tag.destroy({ where: { id: req.params.id} })
-      console.log(deletedData);
+      
       if (deletedData) {
-        res.status(200).json(deletedData);
+        const delMessage = {
+          message : 'Successfully Deleted',
+          data: tagData
+        }
+        res.status(200).json(delMessage);
         return;
       } else 
       {

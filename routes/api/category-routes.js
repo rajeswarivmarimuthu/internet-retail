@@ -39,9 +39,12 @@ router.post('/', async (req, res) => {
   // route to create a new category
   try{
   if (req.body) {
-    console.log(req.body);
     const newCategory = await Category.create(req.body);
-    res.status(200).json(newCategory.id);
+    const createMessage = {
+      message: 'Successfully created the category',
+      data: newCategory.id
+    }
+    res.status(200).json(createMessage);
     return;
   }
   else 
@@ -58,14 +61,20 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   // update a category by its `id` value
   try{
-    console.log(req.body);
+
     if (req.body && req.params.id) {
       const updatedCategory = await Category.update(req.body, {
         where: {
           id: req.params.id,
         },
       })
-      res.status(200).json(updatedCategory.id);
+
+      const putMessage = {
+        message: 'successfully updated the category',
+        data: updatedCategory.id
+      }
+
+      res.status(200).json(putMessage);
       return;
     }
     else 
@@ -83,10 +92,19 @@ router.delete('/:id', async (req, res) => {
   // delete a category by its `id` value
   try{
     if (req.params.id) {
+
+      const categoryData = await Category.findByPk(req.params.id, {
+        include: [{ model: Product}],
+      });
+
       const deletedData = await Category.destroy({ where: { id: req.params.id} })
-      console.log(deletedData);
+
       if (deletedData) {
-        res.status(200).json(deletedData);
+        const delMessage = {
+          message: 'Deleted Successfully',
+          data: categoryData
+        }
+        res.status(200).json(delMessage);
         return;
       } else 
       {

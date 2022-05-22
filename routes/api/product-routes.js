@@ -48,9 +48,20 @@ router.post('/', (req, res) => {
         return ProductTag.bulkCreate(productTagIdArr);
       }
       // if no product tags, just respond
-      res.status(200).json(product);
+      const createMessage = {
+        message: 'Product successfully created',
+        data: product.id
+      }
+      res.status(200).json(createMessage);
     })
-    .then((productTagIds) => res.status(200).json(productTagIds))
+    .then((productTagIds) => { 
+      const createMessageTags = {
+        message: 'Product successfully created with Tags',
+        data: productTagIds
+      }
+      res.status(200).json(createMessageTags)
+    
+    })
     .catch((err) => {
       console.log(err);
       res.status(400).json(err);
@@ -91,7 +102,15 @@ router.put('/:id', (req, res) => {
         ProductTag.bulkCreate(newProductTags),
       ]);
     })
-    .then((updatedProductTags) => res.json(updatedProductTags))
+    .then(async(updatedProductTags) => {
+      const productData = await Product.findByPk(req.params.id, {
+        include: [{ model: Category},{model: Tag, through: ProductTag, as: 'product_tags'}],
+      });
+      const updateMesssage = {
+        message: 'Updated the products successfully',
+        data: productData
+      }
+      res.json(updateMesssage)})
     .catch((err) => {
       // console.log(err);
       res.status(400).json(err);
@@ -102,14 +121,22 @@ router.delete('/:id', async (req, res) => {
   // delete one product by its `id` value
   try{
     if (req.params.id) {
+      
+      const productData = await Product.findByPk(req.params.id, {
+        include: [{ model: Category},{model: Tag, through: ProductTag, as: 'product_tags'}],
+      });
+
       const deletedData = await Product.destroy({ where: { id: req.params.id} })
-      console.log(deletedData);
       if (deletedData) {
-        res.status(200).json(deletedData);
+        const delMessage = {
+          message: 'Deleted Successfully',
+          Data: productData
+        }
+        res.status(200).json(delMessage);
         return;
       } else 
       {
-        res.status(404).json({ message: 'No location found with this id!' });
+        res.status(404).json({ message: 'No Product found with this id!' });
         return;
       }
     } 
